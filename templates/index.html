@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BinBot – Smart E-Waste Management</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", sans-serif;
+            background: radial-gradient(circle at top, #020617, #020617);
+            color: #e5e7eb;
+            text-align: center;
+        }
+
+        h1 {
+            color: #22c55e;
+            margin-bottom: 10px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            padding: 30px;
+        }
+
+        /* ---------- UPLOAD BOX ---------- */
+        .upload-box {
+            background: #020617;
+            border: 1px solid #1e293b;
+            padding: 20px;
+            border-radius: 14px;
+            margin-bottom: 30px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            border: none;
+            padding: 12px 22px;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+            color: black;
+            font-weight: bold;
+        }
+
+        /* ---------- IMAGE + SCANNER ---------- */
+        .image-wrapper {
+            position: relative;
+            width: 320px;
+            margin: 25px auto;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 2px solid #22c55e;
+        }
+
+        .image-wrapper img {
+            width: 100%;
+            display: block;
+        }
+
+        .scanner {
+            position: absolute;
+            top: -30%;
+            left: 0;
+            width: 100%;
+            height: 30%;
+            background: linear-gradient(
+                to bottom,
+                rgba(34,197,94,0.0),
+                rgba(34,197,94,0.6),
+                rgba(34,197,94,0.0)
+            );
+            animation: scan 2.5s infinite;
+        }
+
+        @keyframes scan {
+            0% { top: -30%; }
+            50% { top: 100%; }
+            100% { top: -30%; }
+        }
+
+        /* ---------- CARD GRID ---------- */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .card {
+            background: linear-gradient(180deg, #020617, #020617);
+            border: 1px solid #1e293b;
+            border-radius: 18px;
+            padding: 18px;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            min-height: 260px;
+        }
+
+        .card h3 {
+            color: #22c55e;
+            margin-bottom: 10px;
+        }
+
+        .card-content {
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .card ol {
+            padding-left: 18px;
+        }
+
+        .card li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        /* ---------- BULLET LIST ---------- */
+        .card ul {
+            padding-left: 18px;
+        }
+
+        .card ul li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        /* ---------- PERCENTAGE CIRCLE ---------- */
+        .circle {
+            width: 95px;
+            height: 95px;
+            border-radius: 50%;
+            background: conic-gradient(
+                #22c55e 0%,
+                #22c55e var(--value),
+                #1e293b var(--value),
+                #1e293b 100%
+            );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .circle span {
+            font-size: 18px;
+        }
+
+        .footer {
+            margin-top: 40px;
+            font-size: 13px;
+            color: #9ca3af;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>♻️ BinBot – Smart E-Waste Classifier</h1>
+    <p>AI-powered electronic waste detection & management</p>
+
+    <div class="upload-box">
+        <form method="POST" enctype="multipart/form-data">
+            <input type="file" name="image" required>
+            <br><br>
+            <button type="submit">Analyze E-Waste</button>
+        </form>
+
+        {% if image_path %}
+        <div class="image-wrapper">
+            <img src="{{ image_path }}">
+            <div class="scanner"></div>
+        </div>
+
+        <h3>Prediction: {{ prediction }}</h3>
+        <p>Confidence: {{ confidence|round(2) }}%</p>
+        {% endif %}
+    </div>
+
+   {% if ai_result %}
+<div class="card-grid">
+
+    <!-- IDENTIFIED AS -->
+    <div class="card">
+        <h3>🧠 Identified As</h3>
+        <div class="card-content">
+            <p style="font-size:18px; font-weight:bold; color:#22c55e;">
+                {{ ai_result.identified_as }}
+            </p>
+            {% if prediction == "Unknown / Low Confidence" %}
+                <p style="color:#facc15;">Identified using AI analysis</p>
+            {% else %}
+                <p style="color:#94a3b8;">Verified using trained CNN model</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- PROCEDURE -->
+    <div class="card">
+        <h3>🏭 E-Waste Management Procedure</h3>
+        <div class="card-content">
+            <ol>
+                {% for step in ai_result.handling_procedure %}
+                    <li>{{ step }}</li>
+                {% endfor %}
+            </ol>
+        </div>
+    </div>
+
+    <!-- RECYCLABILITY -->
+    <div class="card">
+        <h3>♻️ Recyclability</h3>
+        <div class="card-content">
+
+            <div class="circle" style="--value: {{ recycle_score }}%;">
+                <span>{{ recycle_score }}%</span>
+            </div>
+
+            <ul>
+                {% for point in ai_result.recyclability %}
+                    <li>{{ point }}</li>
+                {% endfor %}
+            </ul>
+
+        </div>
+    </div>
+
+    <!-- ENVIRONMENT -->
+    <div class="card">
+        <h3>🌍 Environmental Impact</h3>
+        <div class="card-content">
+
+            <div class="circle" style="--value: {{ impact_score }}%;">
+                <span>{{ impact_score }}%</span>
+            </div>
+
+            <ul>
+                {% for point in ai_result.environmental_impact %}
+                    <li>{{ point }}</li>
+                {% endfor %}
+            </ul>
+
+        </div>
+    </div>
+
+</div>
+{% endif %}
+
+    <div class="footer">
+         BinBot | CNN + AI Assisted E-Waste Management System
+    </div>
+</div>
+
+</body>
+</html>
