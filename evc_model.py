@@ -2,7 +2,7 @@ import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.applications.efficientnet import preprocess_input
 
-MODEL_PATH = "ewaste_efficientnetb0_final.h5"
+MODEL_PATH = "model/ewaste_efficientnetb0_final.h5"
 TEST_DIR = "dataset/test"
 IMG_SIZE = 224
 BATCH_SIZE = 32

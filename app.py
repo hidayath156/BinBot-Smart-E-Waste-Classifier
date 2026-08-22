@@ -10,7 +10,7 @@ from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.efficientnet import preprocess_input
 
 UPLOAD_FOLDER = "static/uploads"
-MODEL_PATH = "ewaste_efficientnetb0_final.h5"
+MODEL_PATH = "model/ewaste_efficientnetb0_final.h5"
 CLASS_INDEX_PATH = "class_indices.pkl"
 IMG_SIZE = 224
 CONFIDENCE_THRESHOLD = 55
