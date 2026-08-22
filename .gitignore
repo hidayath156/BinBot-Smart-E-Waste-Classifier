@@ -5,3 +5,7 @@ __pycache__/
 .env
 dataset/
 uploads/
+static/uploads/
+convert_to_tflite.py
+compare_models.py
+convert_tflite_experiment.py
